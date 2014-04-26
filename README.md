@@ -3,7 +3,7 @@ Movie import scripts
 
 The purpose of these scripts is to make it easier to import movie files from camera memory cards. This is presently a four-step process:
 
-1. Run `copy_movie_files`, which copies movie files from an memory card or attached camera to a directory on disk.
+1. Run `sync_movie_files`, which copies movie files from an memory card or attached camera to a directory on disk.
 1. Convert the movie files to .mp4 files using Handbrake.
 1. Run `movie_time_fix`, which uses copies the EXIF information from the original movie files to the new .mp4 files, using `exiftool`.
 1. Finally, import the files into Lightroom or other photo management program.
@@ -55,4 +55,13 @@ Surprisingly, the 30fps output files are almost exactly the same size as the 60f
 
 #### Canon EOS M .mov file, 1920x1080p, 30fps
 
-TODO: Fill this in
+A .mov movie from a Canon EOS M, shot at 1920x1080p 30fps, takes about 356 MB/minute. After conversion, the resulting data rates are:
+
+fps | Quality | Resolution | Data rate   | Compression ratio
+--- | ------- | ---------- | ----------- | -----------------
+30  | High    | 1080p      | 57 MB/min   | 6x
+30  | High    | 720p       | 22.5 MB/min | 16x
+30  | High    | 480p       | 11 MB/min   | 32.5x
+30  | Normal  | 1080p      | 47.5 MB/min | 7.5x
+30  | Normal  | 720p       | 19 MB/min   | 19x
+30  | Normal  | 480p       | 9.5 MB/min  | 38x
