@@ -65,8 +65,7 @@ for filename in os.listdir("input"):
             if ret != 0:
                 print("  Error copying EXIF information!"),
 
-            # Set times of new file - now handled by exiftool, so no longer needed
-            # os.utime(fnew, (atime, mtime))
+            os.utime(fnew, (atime, mtime))
 
         print("")
 
