@@ -75,9 +75,11 @@ def copy_exif(old, new):
 
 
 # Convert files in a directory
-def convert_dir(indir, outdir):
+def convert_dir(indir, outdir, donedir):
+    if not os.path.exists(outdir):
+      os.makedirs(outdir)
+
     # Directory to store input files after conversion
-    donedir = os.path.join(indir, "converted")
     if not os.path.exists(donedir):
       os.makedirs(donedir)
 
@@ -102,8 +104,16 @@ def convert_dir(indir, outdir):
             # After conversions, move input file to converted/ directory
             donepath = os.path.join(donedir, infile)
             if os.path.exists(donepath):
-                raise IOError("Can't move input file to converted/ directory: file already exists.")
+                raise IOError("Can't move input file to " + donedir + ": file already exists.")
 
+
+            print "Finished creating output files from " + inpath + "."
+            print "Moving " + inpath + " ==> " + donepath
             os.rename(inpath, donepath)
+            print ""
+            print "======================================================================"
+            print "======================================================================"
+            print ""
 
-convert_dir("input", "output")
+
+convert_dir("input", "output", os.path.join("input", "converted"))
