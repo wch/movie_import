@@ -1,0 +1,109 @@
+#!/usr/bin/env python
+
+import os
+import re
+import subprocess
+
+
+heights = ["480", "720", "1080"]
+
+handbrake = "HandBrakeCLI"
+
+# TODO: Add URL, mention that only one audio track, and faac fallback.
+handbrake_args = "-e x264 -q 20.0 -a 1 -E copy:ac3 -B 160" + \
+    " -6 dpl2 -R Auto -D 0.0 --audio-copy-mask aac,ac3,dtshd,dts,mp3" + \
+    " --audio-fallback faac -f mp4 -4 --decomb --loose-anamorphic --modulus 2 -m" + \
+    " --x264-preset medium --h264-profile high --h264-level 4.1"
+
+# Split args string on spaces, for subprocess.Popen
+handbrake_args = handbrake_args.split()
+
+
+
+# Convert a single movie file. Returns True on success, False on failure.
+def convert_file(input, output, height):
+    print("Converting " + input)
+
+    # Don't overwrite output file if it exists
+    if os.path.isfile(output):
+        print("Output file " + output + " already exists. Not overwriting.")
+        return False
+
+    try:
+        output_tmp = output + ".tmp"
+
+        # Run the handbrake process
+        proc = subprocess.Popen(
+          [handbrake] + handbrake_args +
+          ["-i", input, "-o", output_tmp, "--height", height]
+        )
+        # Block until conversion finishes
+        proc.wait()
+
+        os.rename(output_tmp, output)
+
+    finally:
+        # Clean up temp file if it was left over (because of an error)
+        if (os.path.exists(output_tmp)):
+            os.remove(output_tmp)
+
+    return True
+
+
+# Copy EXIF and time from old file to new file
+def copy_exif(old, new):
+    # Get times for original file
+    (mode, ino, dev, nlink, uid, gid, size, atime, mtime, ctime) = os.stat(old)
+
+    print("Copying EXIF and time" + old + " ==> " + new),
+    if not os.path.exists(new):
+        print("  Destination file does not exist!"),
+
+    if os.path.exists(new):
+        # Copy EXIF data and date from old to new file
+        proc = subprocess.Popen(["exiftool", "-quiet", "-preserve",
+            "-overwrite_original", "-TagsFromFile", old, new])
+        ret = proc.wait()
+
+        if ret != 0:
+            print("  Error copying EXIF information!"),
+
+        os.utime(new, (atime, mtime))
+
+    else:
+        raise IOError("Can't move input file to done/ directory: file already exists.")
+
+
+# Convert files in a directory
+def convert_dir(indir, outdir):
+    # Directory to store input files after conversion
+    donedir = os.path.join(indir, "converted")
+    if not os.path.exists(donedir):
+      os.makedirs(donedir)
+
+    for infile in os.listdir(indir):
+        if re.search("\\.(mov|MTS)$", infile, re.IGNORECASE):
+            for height in heights:
+                inpath = os.path.join(indir, infile)
+
+                outfile = re.sub("\\.(mov|MTS)$", "-" + height + ".mp4", infile)
+                outpath = os.path.join(outdir, outfile)
+
+                # Convert the file and copy EXIF data, since Handbrake doesn't
+                # preserve EXIF.
+                res = convert_file(inpath, outpath, height)
+                if res:
+                    copy_exif(inpath, outpath)
+
+                print ""
+                print "======================================================================"
+                print ""
+
+            # After conversions, move input file to converted/ directory
+            donepath = os.path.join(donedir, infile)
+            if os.path.exists(donepath):
+                raise IOError("Can't move input file to converted/ directory: file already exists.")
+
+            os.rename(inpath, donepath)
+
+convert_dir("input", "output")

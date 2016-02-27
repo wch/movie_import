@@ -4,8 +4,7 @@ Movie import scripts
 The purpose of these scripts is to make it easier to import movie files from camera memory cards. This is presently a four-step process:
 
 1. Run `sync_movie_files`, which copies movie files from an memory card or attached camera to a directory on disk.
-1. Convert the movie files to .mp4 files using Handbrake.
-1. Run `movie_time_fix`, which uses copies the EXIF information from the original movie files to the new .mp4 files, using `exiftool`.
+1. Run `movie_convert` to convert the files from the `input` directory; the results will be put in the `output` directory. It will also copy over EXIF data.
 1. Finally, import the files into Lightroom or other photo management program.
 
 A lot of this functionality has yet to be implemented,
