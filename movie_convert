@@ -5,7 +5,8 @@ import re
 import subprocess
 
 
-heights = ["480", "720", "1080"]
+# heights = ["480", "720", "1080"]
+heights = ["1080"]
 
 handbrake = "HandBrakeCLI"
 
