@@ -11,10 +11,11 @@ heights = ["1080"]
 handbrake = "HandBrakeCLI"
 
 # TODO: Add URL, mention that only one audio track, and faac fallback.
-handbrake_args = "-e x264 -q 20.0 -a 1 -E copy:ac3 -B 160" + \
-    " -6 dpl2 -R Auto -D 0.0 --audio-copy-mask aac,ac3,dtshd,dts,mp3" + \
-    " --audio-fallback faac -f mp4 --decomb --loose-anamorphic --modulus 2 -m" + \
-    " --x264-preset medium --h264-profile high --h264-level 4.1"
+handbrake_args = "-e x264 --quality 20.0 --audio 1 --aencoder av_aac -B 160" + \
+    " --mixdown dpl2 --arate Auto --audio-copy-mask aac,ac3,dtshd,dts,mp3" + \
+    " --audio-fallback aac --format mp4" + \
+    " --comb-detect --decomb --loose-anamorphic --modulus 2 -m" + \
+    " --encoder-preset medium --encoder-profile high --h264-level 4.1"
 
 # Split args string on spaces, for subprocess.Popen
 handbrake_args = handbrake_args.split()
